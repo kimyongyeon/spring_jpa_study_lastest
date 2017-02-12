@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>member JOIN</title>
+</head>
+<body>
+<h1>회원 가입 및 수정</h1>
+<form action="/memberJoin" method="post">
+    <table>
+        <tr>
+            <td>아이디 </td>
+            <td><input type="text" name="userId"></td>
+        </tr>
+        <tr>
+            <td>비밀번호</td>
+            <td><input type="text" name="userPassWd"></td>
+        </tr>
+        <tr>
+            <td>이름 </td>
+            <td><input type="text" name="userName"></td>
+        </tr>
+        <tr>
+            <td>폰 </td>
+            <td><input type="text" name="userPhone"></td>
+        </tr>
+        <tr>
+            <td><button type="button" id="btnSave">저장</button></td>
+            <td><button type="button" id="btnCancel">취소</button></td>
+        </tr>
+    </table>
+</form>
+
+<a href="/memberListTpl.html">목록</a>
+
+<script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+<script>
+    function memberJoin() {
+        $("form").submit();
+    }
+    function memberClear() {
+        $("input").val('').focus();
+    }
+    $("#btnSave").click(function() {
+        memberJoin();
+    });
+    $("#btnCancel").click(function() {
+       memberClear();
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>member List</title>
+    <style>
+        table tr td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>회원 목록</h1>
+    <table>
+        <thead>
+        <tr>
+            <td>순번</td>
+            <td>아이디</td>
+            <td>비밀번호</td>
+            <td>이름</td>
+            <td>폰</td>
+        </tr>
+        </thead>
+        <tbody id="rowData">
+        </tbody>
+    </table>
+
+    <a href="/memberJoinTpl.html">저장</a>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+
+    <script>
+        memberList();
+        function memberList() {
+            $.ajax({
+                url: "/memberList",
+                context: document.body
+            }).done(function(d) {
+                var list = d.mList;
+                var htmlTag = "";
+                var i=1;
+                for(var j=0; j<list.length; j++) {
+                    htmlTag += "<tr>";
+                    htmlTag += "<td>" + i + "</td>";
+                    htmlTag += "<td>" + list[j].userId + "</td>";
+                    htmlTag += "<td>" + list[j].userPassWd + "</td>";
+                    htmlTag += "<td>" + list[j].userName + "</td>";
+                    htmlTag += "<td>" + list[j].userPhone + "</td>";
+                    htmlTag += "</tr>";
+                    i++;
+                }
+                $("#rowData").html(htmlTag);
+            });
+        }
+    </script>
+</body>
+
+</html>
