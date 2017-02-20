@@ -1,12 +1,16 @@
 package com.jpa.study.project.controller;
 
+import com.jpa.study.project.dto.MemberListDTO;
+import com.jpa.study.project.dto.SearchDTO;
 import com.jpa.study.project.respository.MemberRepository;
 import com.jpa.study.project.vo.MemberVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,9 +62,19 @@ public class MemberController {
      */
     @RequestMapping(value = "/memberList")
     @ResponseBody
-    public Map memberList() {
+    public Map memberList(@ModelAttribute("searchDTO")SearchDTO searchDTO) {
         Map rMap = new HashMap();
-        rMap.put("mList", memberRepository.findAll());
+
+        List list = new ArrayList<MemberListDTO>();
+
+        memberRepository.findAll().stream().map((member) -> {
+           MemberListDTO memberListDTO = new MemberListDTO();
+            memberListDTO.setUserName(member.getUserName());
+            list.add(memberListDTO);
+            return member.getId();
+        });
+
+        rMap.put("mList", list);
         return rMap;
     }
 

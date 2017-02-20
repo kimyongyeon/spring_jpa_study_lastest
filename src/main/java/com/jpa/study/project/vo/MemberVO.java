@@ -3,6 +3,8 @@ package com.jpa.study.project.vo;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yongyeonkim on 2017. 2. 5..
@@ -16,6 +18,7 @@ import javax.persistence.*;
 public class MemberVO extends DateVO{
     @Id
     @GeneratedValue
+    @Column(name="member_id")
     private Long id;
 
     @Column
@@ -37,7 +40,8 @@ public class MemberVO extends DateVO{
     private String addr; // 주소
 
     @Column
-    private Long nickId; // 닉네임 아이디
+    @OneToMany(mappedBy = "memberVO")
+    private List<NickNameVO> nickNameVOs = new ArrayList<NickNameVO>(); // 닉네임 아이디
 
     @Column
     private Long commonId; // 공통 코드 테이블 아이디

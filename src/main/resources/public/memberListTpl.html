@@ -29,6 +29,15 @@
             display: inline;
             float: right;
         }
+        input {
+            height: 20px;
+        }
+        button {
+            height:20px;
+        }
+        .input-data {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -46,9 +55,9 @@
                     <option value="99">주소</option>
                 </select>
                 </Label>
-                <Label>순번<input type="checkbox"></Label>
-                <Label>전화번호<input type="checkbox"></Label>
-                <Label>주소<input type="checkbox"></Label>
+                <Label><input type="checkbox">순번</Label>
+                <Label><input type="checkbox">전화번호</Label>
+                <Label><input type="checkbox">주소</Label>
 
                 <input type="date" name="dateStartDate" id="dateStartDate"> ~
                 <input type="date" name="dateEndDate" id="dateEndDate">
@@ -62,12 +71,18 @@
             </div>
         </div>
 
+        <div class="input-data">
+            <input type="text">
+            <input type="text">
+            <input type="text">
+            <input type="text">
+            <input type="text">
+            <input type="text">
+        </div>
+
         <hr>
 
         <div id="alginBox">
-            <div id="left">
-                <input type="text" value="검색조건을 입력하시요.">
-            </div>
             <div id="right">
                 <label for="">페이지</label>
                 <select name="" id="">
@@ -83,6 +98,8 @@
                 </select>
             </div>
         </div>
+
+
 
         <table>
             <colgroup>
@@ -118,9 +135,21 @@
 
     <script>
 
-        var todayDate = new Date();
+        window.onload = function () {
+            var todayDate = new Date();
+            memberList();
+        }
 
-        memberList();
+        // 클래스
+        function Board() {
+            // 속성
+            this.no = "";
+        }
+
+        // 메서드
+        Board.prototype.list  = function () {
+
+        }
 
         // 검색 처리
         function searchProc() {
@@ -154,12 +183,22 @@
             alert("전체선택");
         }
 
-        function fnBtnAdd() { alert("추가");}
+        function fnBtnAdd() {
+//            alert("추가");
+            var selector = $("#btnAdd");
+            var addText = selector.val();
+            if(addText == "추가") {
+                $(".input-data").show();
+                selector.val("저장");
+            } else {
+                $(".input-data").hide();
+                selector.val("추가");
+            }
+        }
         function fnBtnDetail() {alert("상세");}
         function fnBtnDelete() {alert("삭제");}
 
         function memberList() {
-
             console.log(`${todayDate} :: memberList call`);
             var list = [
                 {
