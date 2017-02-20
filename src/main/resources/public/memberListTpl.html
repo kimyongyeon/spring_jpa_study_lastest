@@ -204,17 +204,19 @@
         }
 
         // 회원정보
-        function Member() {
+        function MemberModel() {
+
+            var $t = this;
 
             console.log("##################################");
             console.log(this.constructor.name);
 
-            this.userSeq="";
-            this.userId="";
-            this.userPassWd="";
-            this.userName="";
-            this.userPhone="";
-            this.userAddr="";
+            $t.userSeq="1";
+            $t.userId="testId";
+            $t.userPassWd="testPasswd";
+            $t.userName="testName";
+            $t.userPhone="010-1234-9999";
+            $t.userAddr="samk";
         }
 
         // 목록화면 컴포넌트 리소스
@@ -258,6 +260,8 @@
             objThis.alignList.push({code:"1",codenm:"1.이름"});
             objThis.alignList.push({code:"2",codenm:"2.아이디"});
             objThis.alignList.push({code:"3",codenm:"3.주소"});
+
+            objThis.memberModel = new MemberModel();
         }
 
         // 게시판 컨트롤로
@@ -268,12 +272,14 @@
                 return;
             }
 
+            window.memberModel.userName = "kimyongyeon";
+
             console.log("##################################");
             console.log(this.constructor.name);
 
             objThis.listService = new ListService(); // List Management Service instance
             objThis.uiService = new UiService(); // UI Button Service instance
-            objThis.procService = new ProcService(); // Process Service instance
+            objThis.dbService = new DbService(); // Process Service instance
             objThis.todayDate = new Date();
 
             // 상세화면 저장, 닫기
@@ -306,16 +312,26 @@
         // List Repository
         // ***************************************************************
         function ListService () {
-            console.log(this.constructor.name);
+            var $t = this;
+            console.log($t.constructor.name);
+            $t.isUserSeq = function(userSeq) {
+                return userSeq == "";
+            }
         }
         ListService.prototype.listUpdate = function (Item = {userSeq, userId, userPassWd, userName, userPhone, userAddr}) {
-            var tempList = this.listRemove(Item.userSeq); // 삭제
+            var $t = this;
+            if($t.isUserSeq(Item.userSeq)) {
+                console.log("listRemove userSeq not found");
+                return;
+            }
+            var tempList = $t.listRemove(Item.userSeq); // 삭제
             delete window.list;
             window.list = tempList;
-            this.listAdd(Item); // 등록
+            $t.listAdd(Item); // 등록
         }
         ListService.prototype.listRemove = function ({userSeq=""}) {
-            if(userSeq == "") {
+            var $t = this;
+            if($t.isUserSeq(userSeq)) {
                 console.log("listRemove userSeq not found");
                 return;
             }
@@ -324,6 +340,12 @@
                 });
         }
         ListService.prototype.listAdd = function (Item={userSeq, userId, userPassWd, userName, userPhone, userAddr}) {
+            var $t = this;
+            if($t.isUserSeq(Item.userSeq)) {
+                console.log("listRemove userSeq not found");
+                return;
+            }
+            Item.userId = Item.userSeq || '';
             window.list.push(Item);
             console.log(JSON.stringify(list));
         }
@@ -361,12 +383,18 @@
         }
         UiService.prototype.btnRowDel = function(userSeq = "") { // 행삭제
 
+            var $t = this;
+
             if(userSeq == "") {
                 console.log("btnRowDel userSeq not found");
                 return;
             }
 
-            window.procService.delete(userSeq); // db data one delete
+            var rst = window.dbService.delete(userSeq); // db data one delete
+            if(!rst) {
+                console.log("dbService.delete error");
+                return;
+            }
 
             var item = {};
             item.userSeq = userSeq;
@@ -374,17 +402,21 @@
             delete list;
             list = newList;
 
-            this.btnList();
+            $t.btnList();
 
         }
-        UiService.prototype.btnRowSave = function(userSeq = "") { // 행저장
+        UiService.prototype.btnRowSave = function(Item = {userSeq, userId, userPassWd, userName, userPhone, userAddr}) { // 행저장
 
-            if(userSeq == "") {
-                console.log("btnRowSave userSeq not found");
+            if(Item == undefined) {
+                console.log("btnRowSave Item not found");
                 return;
             }
 
-            window.procService.save(userSeq);
+            var rst = window.dbService.save(Item);
+            if(!rst) {
+                console.log("dbService.save error");
+                return;
+            }
         }
         UiService.prototype.btnRowEdit = function() { // 행수정
         }
@@ -399,7 +431,7 @@
                 return;
             }
 
-            window.procService.detail(userId); // db data one read...
+            var memberModel = window.dbService.detail(userId); // db data one read...
 
             var fnRowAniShow = function () {
                 $(".detail_div").stop().animate({
@@ -414,12 +446,12 @@
 
             fnRowAniShow();
 
-            $("input[name=detail_no]").val('1'); // 순번
-            $("input[name=detail_userid]").val(userId); // 아이디
-            $("input[name=detail_passwd]").val("1234pwd"); // 비밀번호
-            $("input[name=detail_name]").val("name"); // 이름
-            $("input[name=detail_phone]").val("010-1234-1234"); // 폰
-            $("input[name=detail_addr]").val("삼각지역 등대~"); // 주소
+            $("input[name=detail_no]").val(memberModel.userSeq || '1'); // 순번
+            $("input[name=detail_userid]").val(memberModel.userId || userId); // 아이디
+            $("input[name=detail_passwd]").val(memberModel.userPassWd || '1234'); // 비밀번호
+            $("input[name=detail_name]").val(memberModel.userName || "kimyongyeon"); // 이름
+            $("input[name=detail_phone]").val(memberModel.userPhone || "010-1234-1234"); // 폰
+            $("input[name=detail_addr]").val(memberModel.userAddr || "삼각지역 등대~"); // 주소
 
 
             window.fnBtnSave = function() {
@@ -442,7 +474,6 @@
             location.reload();
         }
         UiService.prototype.btnChkAll = function() { // 전체선택
-            console.log(this.constructor.name);
             var isChecked = $("input[name=chkAll]").is(":checked");
             console.log(isChecked);
             if(isChecked) {
@@ -454,7 +485,7 @@
         }
         UiService.prototype.btnList = function() {
 
-            window.procService.list(); // db data list read
+            //var list = window.dbService.list(); // db data list read
 
             $("#rowData").empty();
             var htmlTag = "";
@@ -531,23 +562,82 @@
         // ***************************************************************
         // Process 관리 서비스 클래스
         // ***************************************************************
-        function ProcService () {
+        function DbService () {
             console.log(this.constructor.name);
         }
-        ProcService.prototype.save = function (userSeq = 99) { // data -> db insert
-            console.log(todayDate + ">> db one save :: " + userSeq);
+        DbService.prototype.save = function (Item={userSeq, userId, userPassWd, userName, userPhone, userAddr}) { // data -> db insert
+
+            window.utilService.ajaxByCallback({
+                url: "#save/" + Item,
+                callback: (d) => {
+                    var memberModel = new MemberModel();
+                    memberModel.userSeq = d.userSeq || '1';
+                    memberModel.userId = d.userId || 'testid';
+                    memberModel.userPassWd = d.userPassWd || 'testpasswd';
+                    memberModel.userName = d.userName || 'username';
+                    memberModel.userPhone = d.userPhone || 'testphone';
+                    memberModel.userAddr = d.userAddr || 'testaddr';
+                    console.log(todayDate + ">> db save :: " + JSON.stringify(memberModel));
+                    return memberModel != undefined;
+                }
+            });
+            return true;
         }
-        ProcService.prototype.delete = function (userSeq = 99) { // data -> db delete
-            console.log(todayDate + ">> db one delete :: " + userSeq);
+        DbService.prototype.delete = function (userSeq = '') { // data -> db delete
+
+            window.utilService.ajaxByCallback({
+                url: "#delete/" + userSeq,
+                callback: (d) => {
+                    console.log(todayDate + ">> db delete :: " + userSeq);
+                    userSeq = "1";
+                    return userSeq != '';
+                }
+            });
+            return true;
         }
-        ProcService.prototype.update = function (userSeq = 99) { // data -> db update
-            console.log(todayDate + ">> db one update :: " + userSeq);
+        DbService.prototype.update = function (Item={userSeq, userId, userPassWd, userName, userPhone, userAddr}) { // data -> db update
+            window.utilService.ajaxByCallback({
+                url: "#update/" + Item,
+                callback: (d) => {
+                    var memberModel = new MemberModel();
+                    memberModel.userSeq = d.userSeq || '1';
+                    memberModel.userId = d.userId || 'testid';
+                    memberModel.userPassWd = d.userPassWd || 'testpasswd';
+                    memberModel.userName = d.userName || 'username';
+                    memberModel.userPhone = d.userPhone || 'testphone';
+                    memberModel.userAddr = d.userAddr || 'testaddr';
+                    console.log(todayDate + ">> db update :: " + JSON.stringify(memberModel));
+                    return memberModel != undefined;
+                }
+            });
+            return true;
         }
-        ProcService.prototype.detail = function (userId = 99) { // data -> db detail
-            console.log(todayDate + ">> db one read :: " + userId);
+        DbService.prototype.detail = function (Item={userSeq, userId, userPassWd, userName, userPhone, userAddr}) { // data -> db detail
+            window.utilService.ajaxByCallback({
+                url: "#detail/" + Item,
+                callback: (d) => {
+                    var memberModel = new MemberModel();
+                    memberModel.userSeq = d.userSeq || '1';
+                    memberModel.userId = d.userId || 'testid';
+                    memberModel.userPassWd = d.userPassWd || 'testpasswd';
+                    memberModel.userName = d.userName || 'username';
+                    memberModel.userPhone = d.userPhone || 'testphone';
+                    memberModel.userAddr = d.userAddr || 'testaddr';
+                    console.log(todayDate + ">> db detail :: " + JSON.stringify(memberModel));
+                    return memberModel != undefined;
+                }
+            });
+            return true;
         }
-        ProcService.prototype.list = function () {
-            console.log(todayDate + ">> db list read");
+        DbService.prototype.list = function () {
+            window.utilService.ajaxByCallback({
+                url: "#list",
+                callback: (d) => {
+                    console.log(todayDate + ">> db list :: " + JSON.stringify(d));
+                    return d != undefined;
+                }
+            });
+            return true;
         }
         // ***************************************************************
         // Process 관리 서비스 클래스
