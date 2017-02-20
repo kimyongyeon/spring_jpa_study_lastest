@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>member List</title>
+    <title>회원관리</title>
     <style>
         table {
-            width: 1200px;
+            width: 1080px;
+            table-layout: fixed;
         }
         table tr td {
             border: 1px solid black;
             text-align: center;
+        }
+        table tr td input {
+            width: 90%;
         }
         #searchBox {
             display: inline;
@@ -30,44 +34,64 @@
             float: right;
         }
         input {
-            height: 20px;
+            /*height: 30px;*/
         }
         button {
-            height:20px;
+            /*height:30px;*/
         }
         .input-data {
             display: none;
+        }
+        .detail_input {
+            width: 99%;
+        }
+        .detail_div {
+            display: none;
+        }
+        .detail_table {
+            width: 500px;
+            border: 1px solid red;
+            background: aquamarine;
+        }
+        .detail_table tr th {
+            text-align: left;
+        }
+        .detail_bot_button {
+            margin-top: 5px;
+            width: 500px;
+            text-align: right;
+        }
+        .mt10 {
+            margin-top:10px;
+        }
+        .table_top_button {
+            margin-bottom:5px;
         }
     </style>
 </head>
 <body>
     <h1>회원 목록</h1>
     <form action="/memberSearch">
-
-
         <div id="searchParentBox">
             <div id="searchBox">
                 <Label>검색
-                    <select name="selectSearch" id="selectSearch">
+                    <select name="srh_select">
                     <option value="99">전체</option>
                     <option value="99">이름</option>
                     <option value="99">아이디</option>
                     <option value="99">주소</option>
                 </select>
                 </Label>
-                <Label><input type="checkbox">순번</Label>
-                <Label><input type="checkbox">전화번호</Label>
-                <Label><input type="checkbox">주소</Label>
+                <Label><input type="checkbox" name="srh_no">순번</Label>
+                <Label><input type="checkbox" name="srh_phone">전화번호</Label>
+                <Label><input type="checkbox" name="srh_addr">주소</Label>
 
-                <input type="date" name="dateStartDate" id="dateStartDate"> ~
-                <input type="date" name="dateEndDate" id="dateEndDate">
+                <input type="date" name="srh_ss_date" id="srh_se_date"> ~
+                <input type="date" name="srh_es_date" id="srh_ee_date">
 
-                <input type="text" name="txtSearch" id="txtSearch">
-                <input type="button" name="btnSearch" id="btnSearch" value="검색" onclick="fnBtnSearch();">
-                <input type="button" name="btnAdd" id="btnAdd" value="추가" onclick="fnBtnAdd();">
-                <input type="button" name="btnDetail" id="btnDetail" value="상세" onclick="fnBtnDetail();">
-                <input type="button" name="btnDelete" id="btnDelete" value="삭제" onclick="fnBtnDelete();">
-                <input type="button" name="btnRefresh" id="btnRefresh" value="다시로딩" onclick="fnBtnRefresh();">
+                <input type="text" name="srh_word">
+                <input type="button" name="btnSearch" id="btnSearch" value="검색" onclick="utilService.btnSearch();">
+                <input type="button" name="btnRefresh" id="btnRefresh" value="다시로딩" onclick="uiService.btnReload();">
             </div>
         </div>
 
@@ -84,14 +108,14 @@
 
         <div id="alginBox">
             <div id="right">
-                <label for="">페이지</label>
-                <select name="" id="">
+                <label>페이지</label>
+                <select name="srh_page">
                     <option value="">10</option>
                     <option value="">20</option>
                     <option value="">30</option>
                 </select>
-                <label for="">정렬</label>
-                <select name="" id="">
+                <label>정렬</label>
+                <select name="srh_align">
                     <option value="">아이디</option>
                     <option value="">비밀번호</option>
                     <option value="">이름</option>
@@ -99,8 +123,10 @@
             </div>
         </div>
 
-
-
+        <div class="table_top_button">
+            <button onclick="uiService.btnRowAdd(); return false;">행추가</button>
+            <button onclick="uiService.btnRowUpdate(); return false;">행수정</button>
+        </div>
         <table>
             <colgroup>
                 <col width="3%">
@@ -113,18 +139,53 @@
             </colgroup>
             <thead>
             <tr>
-                <td><input type="checkbox" name="chkAll" onclick="fnCheckAll()"></td>
+                <td><input type="checkbox" name="chkAll" onclick="uiService.btnChkAll();"></td>
                 <td>순번</td>
                 <td>아이디</td>
                 <td>비밀번호</td>
                 <td>이름</td>
                 <td>폰</td>
                 <td>주소</td>
+                <td>삭제유무</td>
             </tr>
             </thead>
             <tbody id="rowData">
             </tbody>
         </table>
+
+        <div class="detail_div">
+            <table class="detail_table">
+                <tr>
+                    <th>순번</th>
+                    <td><input class="detail_input" name="detail_no" type="text"></td>
+                </tr>
+                <tr>
+                    <th>아이디</th>
+                    <td><input class="detail_input" name="detail_userid" type="text"></td>
+                </tr>
+                <tr>
+                    <th>비밀번호</th>
+                    <td><input class="detail_input" name="detail_passwd" type="text"></td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td><input class="detail_input" name="detail_name" type="text"></td>
+                </tr>
+                <tr>
+                    <th>폰</th>
+                    <td><input class="detail_input" name="detail_phone" type="text"></td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td><input class="detail_input" name="detail_addr" type="text"></td>
+                </tr>
+            </table>
+            <div class="detail_bot_button">
+                <button onclick="fnBtnSave(); return false;">저장</button>
+                <button onclick="fnBtnDel(); return false;">삭제</button>
+                <button onclick="fnBtnCancel(); return false;">닫기</button>
+            </div>
+        </div>
 
         <a href="/memberJoinTpl.html">저장화면 이동</a>
         <a href="/memberJoinTpl.html">상세화면 이동</a>
@@ -136,117 +197,362 @@
     <script>
 
         window.onload = function () {
-            var todayDate = new Date();
-            memberList();
+            console.log("##################################");
+            console.log(this.constructor.name);
+            var dataResource = new DataResource(this, {});
+            var boardController = new BoardController(this);
         }
 
-        // 클래스
-        function Board() {
-            // 속성
-            this.no = "";
+        // 회원정보
+        function Member() {
+
+            console.log("##################################");
+            console.log(this.constructor.name);
+
+            this.userSeq="";
+            this.userId="";
+            this.userPassWd="";
+            this.userName="";
+            this.userPhone="";
+            this.userAddr="";
         }
 
-        // 메서드
-        Board.prototype.list  = function () {
+        // 목록화면 컴포넌트 리소스
+        function DataResource(objThis = "", {memberList="", searchList="", pageList="", alignList=""}) {
 
-        }
-
-        // 검색 처리
-        function searchProc() {
-            console.log(`${todayDate} :: searchProc call`);
-        }
-
-        // input 리셋
-        function inputReset() {
-            console.log(`${todayDate} :: inputReset call`);
-        }
-
-        // select 목록 초기화
-        function selectListInit() {
-            console.log(`${todayDate} :: selectListInit call`);
-        }
-
-        function alertDetail() {
-            alert("상세화면 입니다. ");
-        }
-
-        function fnBtnRefresh() {
-            location.reload();
-        }
-
-        function fnBtnSearch() {
-            var txtSearch = document.querySelector("#txtSearch").value;
-            alert(`${txtSearch}`);
-        }
-
-        function fnCheckAll() {
-            alert("전체선택");
-        }
-
-        function fnBtnAdd() {
-//            alert("추가");
-            var selector = $("#btnAdd");
-            var addText = selector.val();
-            if(addText == "추가") {
-                $(".input-data").show();
-                selector.val("저장");
-            } else {
-                $(".input-data").hide();
-                selector.val("추가");
+            if(objThis == "") {
+                console.log("DataResource objThis not found");
+                return;
             }
-        }
-        function fnBtnDetail() {alert("상세");}
-        function fnBtnDelete() {alert("삭제");}
 
-        function memberList() {
-            console.log(`${todayDate} :: memberList call`);
-            var list = [
-                {
+            console.log("##################################");
+            console.log(this.constructor.name);
+
+            objThis.utilService = new UtilService(); // Util Service instance
+
+            objThis.list = [] || memberList;
+            objThis.searchList =[] || searchList; // 검색조건
+            objThis.pageList =[] || pageList; // 페이지
+            objThis.alignList = [] || alignList; // 정렬
+
+            if (objThis.list != "") return;
+            if (objThis.searchList != "") return;
+            if (objThis.pageList != "") return;
+            if (objThis.alignList != "") return;
+
+            objThis.list.push({
+                    userSeq: objThis.utilService.uuid(),
                     userId: "kyy82",
                     userPassWd: "1234",
                     userName: "kimyongyeon",
                     userPhone: "010-1234-1234",
                     userAddr: "삼각지역 등대",
                 }
-            ];
+            );
+            objThis.searchList.push({code:"1",codenm:"이름"});
+            objThis.searchList.push({code:"2",codenm:"아이디"});
+            objThis.searchList.push({code:"3",codenm:"주소"});
+            objThis.pageList.push({code:"10",codenm:"100"});
+            objThis.pageList.push({code:"20",codenm:"200"});
+            objThis.pageList.push({code:"30",codenm:"300"});
+            objThis.alignList.push({code:"1",codenm:"1.이름"});
+            objThis.alignList.push({code:"2",codenm:"2.아이디"});
+            objThis.alignList.push({code:"3",codenm:"3.주소"});
+        }
+
+        // 게시판 컨트롤로
+        function BoardController(objThis = "") {
+
+            if(objThis == "") {
+                console.log("BoardController objThis not found");
+                return;
+            }
+
+            console.log("##################################");
+            console.log(this.constructor.name);
+
+            objThis.listService = new ListService(); // List Management Service instance
+            objThis.uiService = new UiService(); // UI Button Service instance
+            objThis.procService = new ProcService(); // Process Service instance
+            objThis.todayDate = new Date();
+
+            // 상세화면 저장, 닫기
+            objThis.fnBtnSave, objThis.fnBtnCancel, objThis.fnBtnDel;
+
+            // 검색조건 select box draw
+            objThis.uiService.selectBoxDraw({
+                selector: "select[name=srh_select]",
+                list: objThis.searchList,
+                currentIndex: 2
+            });
+            // 페이지 select box draw
+            objThis.uiService.selectBoxDraw({
+                selector: "select[name=srh_page]",
+                list: objThis.pageList,
+                currentIndex: 10
+            });
+            // 정렬 select box draw
+            objThis.uiService.selectBoxDraw( {
+                selector: "select[name=srh_align]",
+                list: objThis.alignList,
+                currentIndex: 1
+            });
+
+            objThis.uiService.btnList();
+        }
+
+        // ***************************************************************
+        // List 관리 서비스 클래스
+        // List Repository
+        // ***************************************************************
+        function ListService () {
+            console.log(this.constructor.name);
+        }
+        ListService.prototype.listUpdate = function (Item = {userSeq, userId, userPassWd, userName, userPhone, userAddr}) {
+            var tempList = this.listRemove(Item.userSeq); // 삭제
+            delete window.list;
+            window.list = tempList;
+            this.listAdd(Item); // 등록
+        }
+        ListService.prototype.listRemove = function ({userSeq=""}) {
+            if(userSeq == "") {
+                console.log("listRemove userSeq not found");
+                return;
+            }
+            return window.list.filter(function(i) {
+                    return i.userSeq != userSeq
+                });
+        }
+        ListService.prototype.listAdd = function (Item={userSeq, userId, userPassWd, userName, userPhone, userAddr}) {
+            window.list.push(Item);
+            console.log(JSON.stringify(list));
+        }
+        // ***************************************************************
+        // List 관리 서비스 클래스
+        // ***************************************************************
+
+        // ***************************************************************
+        // Ui 관리 서비스 클래스
+        // ***************************************************************
+        function UiService() {
+            console.log(this.constructor.name);
+        }
+        UiService.prototype.btnRowAdd = function(uuidNew = window.utilService.uuid()) { /// 행추가
+
+            var item = {};
+            item.userSeq = uuidNew;
+            window.listService.listAdd(item); // array data proc
+
+            var htmlTag = "";
+            htmlTag += "<tr>";
+            htmlTag += "<td><input type=checkbox name=chk></td>";
+            htmlTag += `<td>${list.length+1}</td>`;
+            htmlTag += `<td><input type="text" value="${item.userId}"></td>`;
+            htmlTag += `<td><input type="text"></td>`;
+            htmlTag += `<td><input type="text"></td>`;
+            htmlTag += `<td><input type="text"></td>`;
+            htmlTag += `<td><input type="text"></td>`;
+            htmlTag += `<td>
+                <button onclick="uiService.btnRowSave('${uuidNew}'); return false;" data-id="${uuidNew}">저장</button>
+                <button onclick="uiService.btnRowDel('${uuidNew}'); return false;" data-id="${uuidNew}">삭제</button>
+            </td>`;
+            htmlTag += "</tr>";
+            $("#rowData").append(htmlTag);
+        }
+        UiService.prototype.btnRowDel = function(userSeq = "") { // 행삭제
+
+            if(userSeq == "") {
+                console.log("btnRowDel userSeq not found");
+                return;
+            }
+
+            window.procService.delete(userSeq); // db data one delete
+
+            var item = {};
+            item.userSeq = userSeq;
+            var newList = window.listService.listRemove(item);
+            delete list;
+            list = newList;
+
+            this.btnList();
+
+        }
+        UiService.prototype.btnRowSave = function(userSeq = "") { // 행저장
+
+            if(userSeq == "") {
+                console.log("btnRowSave userSeq not found");
+                return;
+            }
+
+            window.procService.save(userSeq);
+        }
+        UiService.prototype.btnRowEdit = function() { // 행수정
+        }
+        UiService.prototype.btnSearch = function() { // 검색
+            var txtSearch = document.querySelector("#txtSearch").value;
+            alert(`${txtSearch}`);
+        }
+        UiService.prototype.btnDetail = function(userId = "") { // 상세화면 이동
+
+            if(userId == "") {
+                console.log("btnRowDel userId not found");
+                return;
+            }
+
+            window.procService.detail(userId); // db data one read...
+
+            var fnRowAniShow = function () {
+                $(".detail_div").stop().animate({
+                    height: "250px"
+                }, 400, () => $(".detail_div").fadeIn("slow"));
+            }
+            var fnRowAniHide = function () {
+                $(".detail_div").stop().animate({
+                    height: "0px"
+                }, 400, () => $(".detail_div").hide());
+            }
+
+            fnRowAniShow();
+
+            $("input[name=detail_no]").val('1'); // 순번
+            $("input[name=detail_userid]").val(userId); // 아이디
+            $("input[name=detail_passwd]").val("1234pwd"); // 비밀번호
+            $("input[name=detail_name]").val("name"); // 이름
+            $("input[name=detail_phone]").val("010-1234-1234"); // 폰
+            $("input[name=detail_addr]").val("삼각지역 등대~"); // 주소
+
+
+            window.fnBtnSave = function() {
+                fnRowAniHide();
+            }
+
+            window.fnBtnCancel = function() {
+                fnRowAniHide();
+            }
+
+            window.fnBtnDel = function() {
+                var r = confirm("정말로 삭제할까요?");
+                if(r) {
+                    console.log("삭제.. ㅠㅠ");
+                    fnRowAniHide();
+                }
+            }
+        }
+        UiService.prototype.btnReload = function() { // 다시로딩
+            location.reload();
+        }
+        UiService.prototype.btnChkAll = function() { // 전체선택
+            console.log(this.constructor.name);
+            var isChecked = $("input[name=chkAll]").is(":checked");
+            console.log(isChecked);
+            if(isChecked) {
+                $("input[name=chk]").prop("checked", true);
+            } else {
+                $("input[name=chk]").prop("checked", false);
+            }
+
+        }
+        UiService.prototype.btnList = function() {
+
+            window.procService.list(); // db data list read
+
+            $("#rowData").empty();
             var htmlTag = "";
             var i = 1;
             for(var j=0; j<list.length; j++) {
                 htmlTag += "<tr>";
                 htmlTag += "<td><input type=checkbox name=chk></td>";
                 htmlTag += `<td>${i}</td>`;
-                htmlTag += `<td><a href="javascript:alertDetail();">${list[j].userId}</a></td>`;
-                htmlTag += `<td>${list[j].userPassWd}</td>`;
-                htmlTag += `<td>${list[j].userName}</td>`;
-                htmlTag += `<td>${list[j].userPhone}</td>`;
-                htmlTag += `<td>${list[j].userAddr}</td>`;
+                htmlTag += `<td><a href="javascript:uiService.btnDetail('${list[j].userId || ''}');">${list[j].userId || ''}</a></td>`;
+                htmlTag += `<td>${list[j].userPassWd || ''}</td>`;
+                htmlTag += `<td>${list[j].userName || ''}</td>`;
+                htmlTag += `<td>${list[j].userPhone || ''}</td>`;
+                htmlTag += `<td>${list[j].userAddr || ''}</td>`;
+                htmlTag += `<td><button onclick="uiService.btnRowDel('${list[j].userSeq}'); return false;" data-id="${list[j].userSeq}">삭제</button></td>`;
                 htmlTag += "</tr>";
                 i++;
             }
-            document.querySelector("#rowData").innerHTML = htmlTag;
 
-//            $.ajax({
-//                url: "/memberList",
-//                context: document.body
-//            }).done(function(d) {
-//                var list = d.mList;
-//                var htmlTag = "";
-//                var i=1;
-//                for(var j=0; j<list.length; j++) {
-//                    htmlTag += "<tr>";
-//                    htmlTag += "<td><input type=checkbox name=chk></td>";
-//                    htmlTag += "<td>" + i + "</td>";
-//                    htmlTag += "<td>" + list[j].userId + "</td>";
-//                    htmlTag += "<td>" + list[j].userPassWd + "</td>";
-//                    htmlTag += "<td>" + list[j].userName + "</td>";
-//                    htmlTag += "<td>" + list[j].userPhone + "</td>";
-//                    htmlTag += "<td>" + list[j].userPhone + "</td>";
-//                    htmlTag += "</tr>";
-//                    i++;
-//                }
-//                $("#rowData").html(htmlTag);
-//            });
+            if(list.length == 0) {
+                $("#rowData").empty();
+            } else {
+                $("#rowData").append(htmlTag);
+            }
         }
+        UiService.prototype.selectBoxDraw = function({selector, list, currentIndex}) {
+
+            $(selector).empty();
+            var optionHtml = "";
+            optionHtml += `<option value='' selected>전체</option>`;
+            for(var i=0; i<list.length; i++) {
+
+                if(list[i].code == currentIndex) {
+                    optionHtml += `<option value='${list[i].code}' selected>${list[i].codenm}</option>`;
+                } else {
+                    optionHtml += `<option value='${list[i].code}'>${list[i].codenm}</option>`;
+                }
+            }
+            $(selector).append(optionHtml);
+        }
+        // ***************************************************************
+        // Ui 관리 서비스 클래스
+        // ***************************************************************
+
+        // ***************************************************************
+        // Util 관리 서비스 클래스
+        // ***************************************************************
+        function UtilService() {
+            console.log(this.constructor.name);
+        }
+        UtilService.prototype.nowDateFormat = function() {
+
+        }
+        UtilService.prototype.uuid = function () {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                    .toString(16)
+                    .substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                s4() + '-' + s4() + s4() + s4();
+        }
+        UtilService.prototype.ajaxByCallback = function ({url, callback}) {
+            $.ajax({
+                url: url,
+                dataType: "json"
+            }).done(function(d) {
+                callback(d);
+            });
+        }
+        // ***************************************************************
+        // Util 관리 서비스 클래스
+        // ***************************************************************
+
+        // ***************************************************************
+        // Process 관리 서비스 클래스
+        // ***************************************************************
+        function ProcService () {
+            console.log(this.constructor.name);
+        }
+        ProcService.prototype.save = function (userSeq = 99) { // data -> db insert
+            console.log(todayDate + ">> db one save :: " + userSeq);
+        }
+        ProcService.prototype.delete = function (userSeq = 99) { // data -> db delete
+            console.log(todayDate + ">> db one delete :: " + userSeq);
+        }
+        ProcService.prototype.update = function (userSeq = 99) { // data -> db update
+            console.log(todayDate + ">> db one update :: " + userSeq);
+        }
+        ProcService.prototype.detail = function (userId = 99) { // data -> db detail
+            console.log(todayDate + ">> db one read :: " + userId);
+        }
+        ProcService.prototype.list = function () {
+            console.log(todayDate + ">> db list read");
+        }
+        // ***************************************************************
+        // Process 관리 서비스 클래스
+        // ***************************************************************
+
     </script>
 </body>
 
